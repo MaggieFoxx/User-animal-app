@@ -1,19 +1,13 @@
 import { useMemo, useState } from "react";
-import { User } from "../app/Users";
+import { Animal, TableProps, User } from "../app/types";
 import {
   ColumnDef,
   flexRender,
   getCoreRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { Animal } from "../app/Animals";
 
-interface TableProps {
-  items: User[] | Animal[];
-  isUser: boolean;
-}
-
-const Table = ({ items, isUser }: TableProps) => {
+const Table: React.FC<TableProps> = ({ items, isUser, onEdit }) => {
   const [filter, setFilter] = useState<string>("");
 
   const filteredUsers = useMemo(() => {
@@ -57,20 +51,16 @@ const Table = ({ items, isUser }: TableProps) => {
         header: "Edit",
         cell: ({ row }) => (
           <button
-            onClick={() => handleEdit(row.original.id)}
-            className="bg-blue-500 text-white py-1 px-2 rounded"
+            onClick={() => onEdit(row.original)}
+            className="custom-button bg-indigo-600"
           >
             Edit
           </button>
         ),
       },
     ],
-    [isUser]
+    [isUser, onEdit]
   );
-
-  const handleEdit = (userId: string) => {
-    console.log(`Edit user with ID: ${userId}`);
-  };
 
   const clearFilter = () => {
     setFilter("");
@@ -89,13 +79,10 @@ const Table = ({ items, isUser }: TableProps) => {
         placeholder="Filter by name"
         value={filter}
         onChange={(e) => setFilter(e.target.value)}
-        className="mb-2 p-2 border border-gray-300 rounded"
+        className="input-field p-2 my-5"
       />
 
-      <button
-        onClick={clearFilter}
-        className="ml-2 bg-red-500 text-white py-1 px-3 rounded"
-      >
+      <button onClick={clearFilter} className="custom-button bg-red-500">
         Clear
       </button>
 
@@ -132,7 +119,7 @@ const Table = ({ items, isUser }: TableProps) => {
               onClick={() => console.log(`User ID: ${row.original.id}`)}
             >
               {row.getVisibleCells().map((cell) => (
-                <td key={cell.id} className="border border-gray-300 px-4 py-2">
+                <td key={cell.id} className="border border-gray-300 px-4">
                   {flexRender(cell.column.columnDef.cell, cell.getContext())}
                 </td>
               ))}
